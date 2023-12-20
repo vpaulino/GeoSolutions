@@ -1,0 +1,37 @@
+version: '3.4'
+
+services:
+  countryapi:
+    image: ${DOCKER_REGISTRY-}countryapi
+    build:
+      context: .
+      dockerfile: CountryApi/Dockerfile
+    volumes:
+      - "C:\\Users\\vmlep\\AppData\\Roaming\\ASP.NET\\Https:/root/.aspnet/https:ro"
+      - "C:\\Users\\vmlep\\AppData\\Roaming\\ASP.NET\\Https:/home/app/.aspnet/https:ro"
+      - ./CountryApi/GeoJSON:/GeoJSON
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - elasticsearch
+    environment:
+      - ConnectionStrings.elasticSearchDb=http://elasticsearch:9200
+    
+
+  # Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  # Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.0
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
